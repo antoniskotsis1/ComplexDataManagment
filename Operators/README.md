@@ -18,7 +18,7 @@ These operators were implemented by alteration on the merge-join algorithm
 R_sorted.tsv or S_sorted.tsv
 Tab seperated values sortded by ascending orded. Formation (str, int)
 
-##GroupBy
+## GroupBy
 Implemented by the recursive merge-sort algorithm
 ### Input: 
 R.tsv 
