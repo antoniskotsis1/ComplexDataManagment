@@ -1,10 +1,62 @@
 import argparse
 from pymorton import interleave_latlng
+from math import ceil
 import time
 
 
-def second_element(elem):
-    return elem[1]
+def nodes_mbr(list_of_mbrs):
+    x_cor = {'x': [], 'y': []}
+    for i in list_of_mbrs:
+        for index, values in enumerate(i[-1]):
+            if index < 2:
+                x_cor['x'].append(values)
+            else:
+                x_cor['y'].append(values)
+    return get_mbr_values(x_cor)
+
+
+def get_new_mbr(nodes):
+    res = []
+    for node in nodes:
+        node_id = node[1]
+        res.append([node_id, nodes_mbr(node[-1])])
+    return res
+
+
+def check_last_node(nodes, level):
+    print(f"{len(nodes)} nodes at level {level}")
+    if len(nodes[-1][-1]) < 8 and len(nodes) != 1:
+        x = nodes[-2][-1][-(8 - len(nodes[-1][-1])):]  # get the last n element from the exact
+        # prev so that len of curr node becomes equal to 8
+        y = nodes[-1][-1]
+        nodes[-1][-1] = x + y
+
+
+def create_tree(mbrs, node_capacity, level, start_node_id):
+    if len(mbrs) < 2:
+        return
+    res = []
+    nodes = ceil(len(mbrs) / node_capacity)
+    for node_id in range(nodes):
+        temp = []
+
+        if len(mbrs) > 20:
+            group = 20
+        else:
+            group = len(mbrs)
+
+        for mbr in range(group):
+            temp.append(mbrs[mbr])
+        mbrs = mbrs[mbr+1:]
+        if level != 0:
+            new = get_new_mbr(temp)
+            res.append([1, node_id + start_node_id, new])
+        else:
+            res.append([0 if level == 0 else 1, node_id + start_node_id, temp])
+    check_last_node(res,level)
+    for i in res:
+        r_t.write(str(i)+'\n')
+    create_tree(res, 20, level + 1, node_id + start_node_id + 1)  # create the parent nodes
 
 
 def get_mbr_values(cords_dict):
@@ -15,11 +67,7 @@ def get_mbr_values(cords_dict):
     return [x_min, x_max, y_min, y_max]
 
 
-def delete_z_value(element):
-    return element[0], element[-1]
-
-
-def calculate_mbrs():
+def calculate_original_mbrs():
     cords_dict = {'x': [], 'y': []}
     sorted_mbrs = []
     info_list = offset.readline().split(',')
@@ -34,31 +82,30 @@ def calculate_mbrs():
         mbr = get_mbr_values(cords_dict)
         cords_dict['x'].clear()
         cords_dict['y'].clear()
-        # mbrs[info_list[0]] = mbr
         center_x = (mbr[0] + mbr[1]) / 2
         center_y = (mbr[2] + mbr[3]) / 2
-        sorted_mbrs.append((mbr_id, interleave_latlng(center_y, center_x), mbr))
+        sorted_mbrs.append([mbr_id, interleave_latlng(center_y, center_x), mbr])
         info_list = offset.readline().split(',')
-    return list(map(delete_z_value, sorted(sorted_mbrs, key=second_element)))
+    return list(map(lambda elem: [elem[0], elem[-1]], sorted(sorted_mbrs, key=lambda el: el[1])))
 
 
 def main():
-    mbrs = calculate_mbrs()
+    mbrs = calculate_original_mbrs()
+    create_tree(mbrs, 20, 0, 0)
 
 
 if __name__ == '__main__':
-    # parser = argparse.ArgumentParser(description="R-Tree creation throw bulk loading")
-    # parser.add_argument("coordinates", metavar='coors_file', help="file containing polygon's coordinates")
-    # parser.add_argument("offsets", metavar='offset_file', help="file containing coordinate offsets")
-    # args = parser.parse_args()
+    parser = argparse.ArgumentParser(description="R-Tree creation throw bulk loading")
+    parser.add_argument("coordinates", metavar='coords_file', help="file containing polygon's coordinates")
+    parser.add_argument("offsets", metavar='offset_file', help="file containing coordinate offsets")
+    args = parser.parse_args()
 
-    # cords = open(args.coordinates)
-    # offset = open(args.offsets)
+    cords = open(args.coordinates)
+    offset = open(args.offsets)
 
-    cords = open('coords.txt')
-    offset = open('offsets.txt')
-
-
+    # cords = open('coords.txt')
+    # offset = open('offsets.txt')
+    r_t = open("Rtree.txt", "w")
 
     st = time.time()
     main()
