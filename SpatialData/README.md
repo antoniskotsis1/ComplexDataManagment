@@ -3,12 +3,16 @@
 ##Part 1: Rtree throw bulk loading
 >### r_tree.py
 > usage: r_tree.py [-h] coords_file offset_file
->####positional arguments:
+
+>**positional arguments:**
+> 
 > coords_file  file containing polygon's coordinates
 > 
 >offset_file  file containing coordinate offsets
->####optional arguments:
->  -h, --help   show this help message and exit
+>
+>**optional arguments:**
+>  
+>-h, --help   show this help message and exit
 
 
 After opening the files given to the command line,
