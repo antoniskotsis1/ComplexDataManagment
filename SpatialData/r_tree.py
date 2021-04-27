@@ -23,19 +23,24 @@ def get_new_mbr(nodes):
     return res
 
 
-def check_last_node(nodes, level):
+def check_last_node(nodes, level, min_capacity):
     print(f"{len(nodes)} nodes at level {level}")
-    if len(nodes[-1][-1]) < 8 and len(nodes) != 1:
-        x = nodes[-2][-1][-(8 - len(nodes[-1][-1])):]  # get the last n element from the exact
+    if len(nodes[-1][-1]) < min_capacity and len(nodes) != 1:
+        x = nodes[-2][-1][-(min_capacity - len(nodes[-1][-1])):]  # get the last n element from the exact
         # prev so that len of curr node becomes equal to 8
         y = nodes[-1][-1]
+        nodes[-2][-1] = nodes[-2][-1][:-(min_capacity - len(nodes[-1][-1]))]
         nodes[-1][-1] = x + y
 
 
-def create_tree(mbrs, node_capacity, level, start_node_id):
+
+
+def create_tree(mbrs, node_capacity, level, start_node_id, min_capacity):
     if len(mbrs) < 2:
         return
     res = []
+    node_id = 0
+    mbr = 0
     nodes = ceil(len(mbrs) / node_capacity)
     for node_id in range(nodes):
         temp = []
@@ -53,10 +58,10 @@ def create_tree(mbrs, node_capacity, level, start_node_id):
             res.append([1, node_id + start_node_id, new])
         else:
             res.append([0 if level == 0 else 1, node_id + start_node_id, temp])
-    check_last_node(res,level)
+    check_last_node(res, level, min_capacity)
     for i in res:
         r_t.write(str(i)+'\n')
-    create_tree(res, 20, level + 1, node_id + start_node_id + 1)  # create the parent nodes
+    create_tree(res, 20, level + 1, node_id + start_node_id + 1, min_capacity)  # create the parent nodes
 
 
 def get_mbr_values(cords_dict):
@@ -84,6 +89,8 @@ def calculate_original_mbrs():
         cords_dict['y'].clear()
         center_x = (mbr[0] + mbr[1]) / 2
         center_y = (mbr[2] + mbr[3]) / 2
+        # print(f'mbr_id: {mbr_id} mbr: {mbr} x_center: {center_x} y_center: {center_y} z_curve: {interleave_latlng(
+        # center_y,center_x)}')
         sorted_mbrs.append([mbr_id, interleave_latlng(center_y, center_x), mbr])
         info_list = offset.readline().split(',')
     return list(map(lambda elem: [elem[0], elem[-1]], sorted(sorted_mbrs, key=lambda el: el[1])))
@@ -91,7 +98,11 @@ def calculate_original_mbrs():
 
 def main():
     mbrs = calculate_original_mbrs()
-    create_tree(mbrs, 20, 0, 0)
+    min_capacity = 8
+    max_capacity = 20
+    start_node_id = 0
+    level = 0
+    create_tree(mbrs, max_capacity, level, start_node_id, min_capacity)
 
 
 if __name__ == '__main__':
@@ -103,8 +114,6 @@ if __name__ == '__main__':
     cords = open(args.coordinates)
     offset = open(args.offsets)
 
-    # cords = open('coords.txt')
-    # offset = open('offsets.txt')
     r_t = open("Rtree.txt", "w")
 
     st = time.time()
