@@ -1,7 +1,8 @@
+# Kotsis Antonios AM 3018
 import argparse
 from pymorton import interleave_latlng
 from math import ceil
-import time
+
 
 
 def nodes_mbr(list_of_mbrs):
@@ -33,10 +34,8 @@ def check_last_node(nodes, level, min_capacity):
         nodes[-1][-1] = x + y
 
 
-
-
 def create_tree(mbrs, node_capacity, level, start_node_id, min_capacity):
-    if len(mbrs) < 2:
+    if len(mbrs) == 1:
         return
     res = []
     node_id = 0
@@ -45,8 +44,8 @@ def create_tree(mbrs, node_capacity, level, start_node_id, min_capacity):
     for node_id in range(nodes):
         temp = []
 
-        if len(mbrs) > 20:
-            group = 20
+        if len(mbrs) > node_capacity:
+            group = node_capacity
         else:
             group = len(mbrs)
 
@@ -89,8 +88,6 @@ def calculate_original_mbrs():
         cords_dict['y'].clear()
         center_x = (mbr[0] + mbr[1]) / 2
         center_y = (mbr[2] + mbr[3]) / 2
-        # print(f'mbr_id: {mbr_id} mbr: {mbr} x_center: {center_x} y_center: {center_y} z_curve: {interleave_latlng(
-        # center_y,center_x)}')
         sorted_mbrs.append([mbr_id, interleave_latlng(center_y, center_x), mbr])
         info_list = offset.readline().split(',')
     return list(map(lambda elem: [elem[0], elem[-1]], sorted(sorted_mbrs, key=lambda el: el[1])))
@@ -116,7 +113,6 @@ if __name__ == '__main__':
 
     r_t = open("Rtree.txt", "w")
 
-    st = time.time()
     main()
-    en = time.time()
-    print(f"time taken: {en - st}")
+
+
