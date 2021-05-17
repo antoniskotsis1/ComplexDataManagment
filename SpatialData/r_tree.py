@@ -4,7 +4,6 @@ from pymorton import interleave_latlng
 from math import ceil
 
 
-
 def nodes_mbr(list_of_mbrs):
     x_cor = {'x': [], 'y': []}
     for i in list_of_mbrs:
