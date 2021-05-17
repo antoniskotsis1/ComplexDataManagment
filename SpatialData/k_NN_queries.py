@@ -128,6 +128,7 @@ def bf_nn_search(q, r_tree):
     while len(res) < k:
         nn = get_next_bf_nn(q, _heap, r_tree)
         heapq.heappop(_heap)
+
         res.append(nn)
     return [i[0] for i in res]
 
