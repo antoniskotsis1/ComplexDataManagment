@@ -55,6 +55,7 @@ def update_heap(search_frontier, neighbour, heuristic_cost):
             break
     else:
         heapq.heappush(search_frontier, (heuristic_cost, neighbour))
+
     if remove_value:
         search_frontier.remove(remove_value)
         heapq.heapify(search_frontier)
@@ -83,11 +84,13 @@ def shortest_path_search_algorithm(algorithm, source_node, target_node):
         for neighbour, edge_weight in current_node.get_neighbours():
             if not neighbour.get_visited():
                 if spd.get(neighbour) > spd.get(current_node) + float(edge_weight):
+
                     for i in path.get(current_node):
                         if i not in path.get(neighbour):
                             path[neighbour].append(i)
                     path[neighbour].append(neighbour)
                     spd[neighbour] = float(edge_weight) + spd.get(current_node)
+
                     if algorithm == "dijkstra":
                         update_heap(search_frontier, neighbour, spd.get(neighbour))
                     else:
