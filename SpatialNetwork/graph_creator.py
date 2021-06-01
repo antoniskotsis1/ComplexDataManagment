@@ -71,6 +71,7 @@ if __name__ == '__main__':
 
     format_output_file()
 
-    # output_file.write(f'{node.get_node_id()} {node.get_dimension()}  {node.get_neighbours()}\n')
-    # if index ==10:
-    #     break
+    nodes_file.close()
+    edges_file.close()
+    output_file.close()
+

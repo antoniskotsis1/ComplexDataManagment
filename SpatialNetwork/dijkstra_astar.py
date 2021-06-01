@@ -69,7 +69,7 @@ def shortest_path_search_algorithm(algorithm, source_node, target_node):
     source_node = graph[source_node]
     search_frontier = []
     spd = {i: math.inf for i in graph}
-    path = {i: [] for i in graph}
+    path = {i: [source_node] for i in graph}
     heapq.heappush(search_frontier, (0, source_node))
     spd[source_node] = 0
     loop_count = 0
@@ -82,12 +82,11 @@ def shortest_path_search_algorithm(algorithm, source_node, target_node):
             present_results(algorithm, loop_count, path.get(target_node), spd.get(target_node))
             return
         for neighbour, edge_weight in current_node.get_neighbours():
+
             if not neighbour.get_visited():
                 if spd.get(neighbour) > spd.get(current_node) + float(edge_weight):
 
-                    for i in path.get(current_node):
-                        if i not in path.get(neighbour):
-                            path[neighbour].append(i)
+                    path[neighbour] = path.get(current_node).copy()
                     path[neighbour].append(neighbour)
                     spd[neighbour] = float(edge_weight) + spd.get(current_node)
 
@@ -105,7 +104,7 @@ def present_results(algorithm, loop_count, path, path_distance):
         print("--A* Results--")
     print(f"Shortest Path Length: {len(path)}")
     print(f"Shortest Path Distance: {path_distance}")
-    print(f"Shortest Path Detected: {list(map(lambda x:x.get_node_id(),path))}")
+    print(f"Shortest Path Detected: {list(map(lambda x: x.get_node_id(), path))}")
     print(f"Number Of Visited Nodes: {loop_count}\n")
 
 
